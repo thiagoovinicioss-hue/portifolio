@@ -11,9 +11,9 @@ export const PROJECTS = [
     category: { pt: 'Clínica odontológica', en: 'Dental clinic', es: 'Clínica dental' },
     technologies: ['HTML', 'CSS', 'JavaScript'],
     description: {
-      pt: 'Landing page completa para clínica de odontologia estética: tratamentos, resultados, equipe, depoimentos e agendamento integrado ao WhatsApp.',
-      en: 'Full landing page for an aesthetic dentistry clinic: treatments, results, team, testimonials and WhatsApp booking.',
-      es: 'Landing page completa para una clínica de odontología estética: tratamientos, resultados, equipo, testimonios y reserva por WhatsApp.',
+      pt: 'Página de conversão completa para clínica de odontologia estética: tratamentos, resultados, equipe, depoimentos e agendamento integrado ao WhatsApp.',
+      en: 'Full conversion page for an aesthetic dentistry clinic: treatments, results, team, testimonials and WhatsApp booking.',
+      es: 'Página de conversión completa para una clínica de odontología estética: tratamientos, resultados, equipo, testimonios y reserva por WhatsApp.',
     },
   },
   {
@@ -24,9 +24,9 @@ export const PROJECTS = [
     category: { pt: 'Estúdio de treino', en: 'Training studio', es: 'Estudio de entrenamiento' },
     technologies: ['HTML', 'CSS', 'JavaScript'],
     description: {
-      pt: 'Landing page de conversão para estúdio de performance: modalidades, estrutura, treinadores, planos e captação para aula experimental gratuita.',
-      en: 'Conversion landing page for a performance studio: modalities, facilities, coaches, plans and free trial-lead capture.',
-      es: 'Landing page de conversión para un estudio de performance: modalidades, instalaciones, entrenadores, planes y captación para la clase gratis.',
+      pt: 'Página de conversão para estúdio de performance: modalidades, estrutura, treinadores, planos e captação para aula experimental gratuita.',
+      en: 'Conversion page for a performance studio: modalities, facilities, coaches, plans and free trial-lead capture.',
+      es: 'Página de conversión para un estudio de performance: modalidades, instalaciones, entrenadores, planes y captación para la clase gratis.',
     },
   },
   {
@@ -76,9 +76,9 @@ export const PROJECTS = [
     category: { pt: 'Estética automotiva', en: 'Automotive detailing', es: 'Detailing automotriz' },
     technologies: ['HTML', 'CSS', 'JavaScript'],
     description: {
-      pt: 'Landing page premium para estúdio de ceramic coating: serviços, pacotes, antes & depois, processo e formulário de orçamento.',
-      en: 'Premium landing page for a ceramic coating studio: services, packages, before & after, process and quote form.',
-      es: 'Landing page premium para un estudio de ceramic coating: servicios, paquetes, antes y después, proceso y formulario de presupuesto.',
+      pt: 'Página de conversão premium para estúdio de ceramic coating: serviços, pacotes, antes & depois, processo e formulário de orçamento.',
+      en: 'Premium conversion page for a ceramic coating studio: services, packages, before & after, process and quote form.',
+      es: 'Página de conversión premium para un estudio de ceramic coating: servicios, paquetes, antes y después, proceso y formulario de presupuesto.',
     },
   },
   {
@@ -102,9 +102,9 @@ export const PROJECTS = [
     category: { pt: 'Estúdio digital (conceito)', en: 'Digital studio (concept)', es: 'Estudio digital (concepto)' },
     technologies: ['HTML', 'CSS', 'JavaScript'],
     description: {
-      pt: 'Website conceitual de estúdio de desenvolvimento focado em conversão — síntese do meu trabalho com landing pages e sites de alta performance.',
-      en: 'Concept website for a development studio obsessed with conversion — a synthesis of my craft around landing pages and high-performance sites.',
-      es: 'Sitio conceptual de un estudio de desarrollo enfocado en conversión: síntesis de mi trabajo con landing pages y sitios de alto rendimiento.',
+      pt: 'Website conceitual de estúdio de desenvolvimento focado em conversão — síntese do meu trabalho com páginas de conversão e sites de alta performance.',
+      en: 'Concept website for a development studio obsessed with conversion — a synthesis of my craft around conversion pages and high-performance sites.',
+      es: 'Sitio conceptual de un estudio de desarrollo enfocado en conversión: síntesis de mi trabajo con páginas de conversión y sitios de alto rendimiento.',
     },
   },
   {
