@@ -19,7 +19,6 @@ const CHAT_DELAY_BEFORE = 700;
 const CHAT_PAUSE = 1050;
 const CHAT_TYPING_MS = 1000;
 const CHAT_STOP_DELAY = 4400;
-const CHAT_EXIT_MS = 520;
 
 const PAGE_STEPS = ['hero', 'benefits', 'treatments', 'ctaRow'];
 const PAGE_OFFSETS = { hero: 14, benefits: 20, treatments: 20, ctaRow: 26 };
@@ -77,6 +76,7 @@ export function initPractice() {
   function resetChat() {
     typing.classList.remove('is-visible');
     chat.innerHTML = '';
+    chat.scrollTop = 0;
     chat.classList.remove('is-exiting');
     chips.forEach((c) => c.classList.remove('is-active', 'is-done'));
   }
@@ -95,13 +95,42 @@ export function initPractice() {
     const read = step.side === 'out' ? `<span class="wa-read">${READ_ICON}</span>` : '';
     msg.innerHTML = `<span class="wa-msg-text">${escapeHTML(t(step.key))}</span><span class="wa-meta">${step.time}${read}</span>`;
     chat.appendChild(msg);
-    chat.scrollTop = chat.scrollHeight;
+  }
+
+  /* Animated reveal of the newest message: previous messages glide up
+     smoothly inside the fixed-size viewport. No scrollbar is shown. */
+  function smoothScrollChat(alive) {
+    return new Promise((resolve) => {
+      if (reducedMotion) {
+        chat.scrollTop = chat.scrollHeight;
+        resolve();
+        return;
+      }
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const target = chat.scrollHeight;
+        const from = chat.scrollTop;
+        const delta = target - from;
+        if (Math.abs(delta) < 1) { resolve(); return; }
+        const t0 = performance.now();
+        const dur = 380;
+        const step = () => {
+          if (alive && !alive()) { resolve(); return; }
+          const p = Math.min(1, (performance.now() - t0) / dur);
+          const ease = 1 - Math.pow(1 - p, 3);
+          chat.scrollTop = from + delta * ease;
+          if (p < 1) requestAnimationFrame(step);
+          else resolve();
+        };
+        requestAnimationFrame(step);
+      }));
+    });
   }
 
   async function renderStaticChat() {
     resetChat();
     typing.classList.remove('is-visible');
     CHAT_STEPS.forEach(emitMessage);
+    chat.scrollTop = chat.scrollHeight;
     chips.forEach((c) => c.classList.add('is-done'));
   }
 
@@ -123,15 +152,19 @@ export function initPractice() {
         }
         if (!chatVisible || chatRun !== id) return;
         emitMessage(CHAT_STEPS[i]);
+        await smoothScrollChat(() => chatVisible && chatRun === id);
         if (CHAT_STEPS[i].chip !== undefined) emitChip(CHAT_STEPS[i].chip);
       }
 
       await wait(CHAT_STOP_DELAY);
       if (!chatVisible || chatRun !== id) return;
+      // Elegant reset: fade the whole messages viewport, clear it while
+      // hidden, then let the next cycle re-fade in. Window size never changes.
       chat.classList.add('is-exiting');
-      await wait(CHAT_EXIT_MS);
+      await wait(reducedMotion ? 10 : 300);
       if (!chatVisible || chatRun !== id) return;
-      chat.classList.remove('is-exiting');
+      resetChat();
+      await wait(reducedMotion ? 10 : 240);
     }
   }
 

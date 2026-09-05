@@ -201,8 +201,8 @@
 
 .wa-body {
   position: relative;
+  height: 360px;
   padding: 16px clamp(14px, 3vw, 20px) 18px;
-  min-height: 340px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -253,7 +253,9 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   scrollbar-width: none;
+  transition: opacity 0.28s ease, transform 0.28s var(--ease);
 }
 .wa-chat::-webkit-scrollbar { display: none; }
 
@@ -266,9 +268,9 @@
   font-size: 14px;
   line-height: 1.45;
   opacity: 0;
-  transform: translateY(14px) scale(0.96);
+  transform: translateY(8px) scale(0.985);
   transform-origin: bottom;
-  animation: waEnter 0.5s var(--ease) forwards;
+  animation: waEnter 0.44s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 .wa-msg.in {
   align-self: flex-start;
@@ -284,10 +286,11 @@
   border-bottom-right-radius: 5px;
   color: var(--wa-ink);
 }
-.wa-chat.is-exiting .wa-msg {
-  opacity: 0 !important;
-  transform: translateY(-10px) !important;
-  transition: opacity 0.5s ease, transform 0.5s ease;
+/* Elegant conversation reset: the whole messages viewport fades together.
+   Children keep their entry animation; the container fade never changes size. */
+.wa-chat.is-exiting {
+  opacity: 0;
+  transform: translateY(6px);
 }
 .wa-msg .wa-msg-text { display: block; }
 .wa-meta {
@@ -308,9 +311,13 @@
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Typing indicator */
+/* Typing indicator — absolute inside the messages viewport so it never
+   changes window size or pushes content; it overlays the bottom edge. */
 .wa-typing {
-  align-self: flex-start;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -319,9 +326,11 @@
   border-bottom-left-radius: 5px;
   background: var(--sand);
   border: 1px solid var(--line);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
   opacity: 0;
-  transform: translateY(6px);
-  transition: opacity 0.25s ease, transform 0.25s var(--ease);
+  transform: translateY(8px);
+  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
 }
 .wa-typing.is-visible { opacity: 1; transform: translateY(0); }
 .wa-typing i {
@@ -664,14 +673,20 @@
   .practice-chips { flex-direction: row; flex-wrap: wrap; justify-content: center; width: auto; }
   .practice-chip { transform: translateY(-6px); }
   .practice-chip.is-done, .practice-chip.is-active { transform: translateY(0); }
+  .wa-body { height: 330px; }
   .journey-track { grid-template-columns: 1fr; gap: 26px; }
   .journey-line { display: none; }
   .journey-step { gap: 4px; }
+}
+
+@media (max-width: 520px) {
+  .wa-body { height: 320px; }
 }
 
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   .practice-chip { opacity: 1; transform: none; }
   .wa-msg { animation-duration: 0.01ms; opacity: 1; transform: none; }
+  .wa-chat { transition-duration: 0.01ms; }
   .wa-typing, .wa-popup, .browser-cursor { transition-duration: 0.01ms; }
 }
