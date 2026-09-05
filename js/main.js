@@ -5,6 +5,7 @@ import { initCarousel } from './carousel.js';
 import { initQuote } from './quote.js';
 import { initAdmin } from './admin.js';
 import { initCalculator } from './calculator.js';
+import { initPractice } from './practice.js';
 
 const views = {};
 let homeScrollY = 0;
@@ -176,6 +177,7 @@ function boot() {
     quote = initQuote();
     admin = initAdmin();
     initCalculator();
+    initPractice();
     window.__admin = admin;
   } catch (err) {
     console.error('[init] module failed to initialize:', err);
