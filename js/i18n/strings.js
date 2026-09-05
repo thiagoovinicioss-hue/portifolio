@@ -149,6 +149,9 @@ export const dictionary = {
     'quote.goals.default': 'Selecione…',
     'quote.goals.options': [
       { v: 'landing', label: 'Landing page' },
+      { v: 'conversion', label: 'Sites de conversão' },
+      { v: 'support_automation', label: 'Automação de atendimento' },
+      { v: 'lead_organization', label: 'Organização de leads' },
     ],
     'quote.objective.label': 'Qual é o principal objetivo?',
     'quote.objective.default': 'Selecione…',
@@ -446,6 +449,9 @@ export const dictionary = {
     'quote.goals.default': 'Select…',
     'quote.goals.options': [
       { v: 'landing', label: 'Landing page' },
+      { v: 'conversion', label: 'Conversion websites' },
+      { v: 'support_automation', label: 'Customer service automation' },
+      { v: 'lead_organization', label: 'Lead organization' },
     ],
     'quote.objective.label': 'What is the main goal?',
     'quote.objective.default': 'Select…',
@@ -743,6 +749,9 @@ export const dictionary = {
     'quote.goals.default': 'Selecciona…',
     'quote.goals.options': [
       { v: 'landing', label: 'Landing page' },
+      { v: 'conversion', label: 'Sitios de conversión' },
+      { v: 'support_automation', label: 'Automatización de la atención' },
+      { v: 'lead_organization', label: 'Organización de leads' },
     ],
     'quote.objective.label': '¿Cuál es el objetivo principal?',
     'quote.objective.default': 'Selecciona…',
