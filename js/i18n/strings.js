@@ -219,6 +219,7 @@ export const dictionary = {
     'quote.success.wa': 'Abrir WhatsApp',
     'quote.success.home': 'Voltar ao site',
     'quote.success.saved': 'Seu pedido também foi registrado com segurança no painel de leads.',
+    'quote.success.saveError': 'O WhatsApp abriu com os seus dados, mas o registro automático falhou — envie a mensagem para não perder nada.',
 
     'wa.intro.name': 'Olá! Me chamo {name} e quero solicitar uma análise gratuita.',
     'wa.intro.company': 'Olá! Me chamo {name}, da {company}, e quero solicitar uma análise gratuita.',
@@ -518,6 +519,7 @@ export const dictionary = {
     'quote.success.wa': 'Open WhatsApp',
     'quote.success.home': 'Back to site',
     'quote.success.saved': 'Your request was also stored securely in the leads dashboard.',
+    'quote.success.saveError': 'WhatsApp opened with your details, but the automatic save failed — please send the message so nothing gets lost.',
 
     'wa.intro.name': 'Hi! My name is {name} and I would like to request a free analysis.',
     'wa.intro.company': 'Hi! My name is {name}, from {company}, and I would like to request a free analysis.',
@@ -817,6 +819,7 @@ export const dictionary = {
     'quote.success.wa': 'Abrir WhatsApp',
     'quote.success.home': 'Volver al sitio',
     'quote.success.saved': 'Tu solicitud también quedó guardada de forma segura en el panel de leads.',
+    'quote.success.saveError': 'WhatsApp se abrió con tus datos, pero el registro automático falló — envía el mensaje para que no se pierda nada.',
 
     'wa.intro.name': '¡Hola! Me llamo {name} y quisiera solicitar un análisis gratuito.',
     'wa.intro.company': '¡Hola! Me llamo {name}, de {company}, y quisiera solicitar un análisis gratuito.',

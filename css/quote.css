@@ -242,6 +242,14 @@
   font-size: 13px;
   color: var(--ink-faint);
 }
+.quote-success-note.is-error {
+  color: #b3541e;
+  background: rgba(179, 84, 30, 0.08);
+  border: 1px solid rgba(179, 84, 30, 0.25);
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-top: 14px;
+}
 .quote-success-delivery {
   margin: 14px auto 0;
   max-width: 420px;

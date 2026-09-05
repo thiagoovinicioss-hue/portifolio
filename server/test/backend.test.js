@@ -67,6 +67,77 @@ describe('public endpoints', () => {
       assert.equal(res.status, 404);
     });
   });
+
+  test('POST /api/leads is public and stores the quote (no token, no origin needed)', async () => {
+    await withApp(baseOverrides, async ({ baseUrl, store }) => {
+      const res = await request(baseUrl, '/api/leads', {
+        method: 'POST',
+        body: {
+          name: 'Ada Lovelace',
+          company_name: 'Analytical Engines',
+          contact: 'ada@example.com',
+          budget: 'R$ 3.000–5.000',
+          selected_addons: ['automação de atendimento'],
+        },
+      });
+      assert.equal(res.status, 201);
+      assert.deepEqual(res.data, { ok: true });
+      assert.match(res.headers.get('cache-control'), /no-store/i);
+
+      const leads = await store.list();
+      assert.equal(leads.length, 1);
+      assert.equal(leads[0].name, 'Ada Lovelace');
+      assert.equal(leads[0].budget, 'R$ 3.000–5.000');
+      assert.deepEqual(leads[0].selected_addons, ['automação de atendimento']);
+      assert.equal(leads[0].status, 'new');
+    });
+  });
+
+  test('POST /api/leads requires a name -> 400', async () => {
+    await withApp(baseOverrides, async ({ baseUrl, store }) => {
+      const res = await request(baseUrl, '/api/leads', { method: 'POST', body: { contact: 'x@y.com' } });
+      assert.equal(res.status, 400);
+      assert.equal(res.data.error, 'bad_request');
+      assert.equal((await store.list()).length, 0);
+    });
+  });
+
+  test('POST /api/leads strips unknown fields and clamps lengths', async () => {
+    await withApp(baseOverrides, async ({ baseUrl, store }) => {
+      const res = await request(baseUrl, '/api/leads', {
+        method: 'POST',
+        body: {
+          name: 'Hacker',
+          role: 'admin',
+          status: 'won',
+          magic: { sql: 'drop table' },
+          budget: 'x'.repeat(500),
+        },
+      });
+      assert.equal(res.status, 201);
+
+      const leads = await store.list();
+      assert.equal(leads.length, 1);
+      assert.equal(leads[0].id, leads[0].id); // id is server-generated, not client-set
+      assert.notEqual(String(leads[0].id).toLowerCase(), 'admin');
+      assert.equal(leads[0].name, 'Hacker');
+      assert.equal(leads[0].role, undefined);
+      assert.equal(leads[0].status, 'new'); // client-supplied status is ignored
+      assert.equal(leads[0].magic, undefined);
+      assert.equal(leads[0].budget, 'x'.repeat(80));
+    });
+  });
+
+  test('POST /api/leads rejects an oversized body -> 400', async () => {
+    await withApp(baseOverrides, async ({ baseUrl, store }) => {
+      const res = await request(baseUrl, '/api/leads', {
+        method: 'POST',
+        body: { name: 'Big', how_it_works_today: 'y'.repeat(20000) },
+      });
+      assert.equal(res.status, 400);
+      assert.equal((await store.list()).length, 0);
+    });
+  });
 });
 
 describe('unauthenticated requests are rejected', () => {

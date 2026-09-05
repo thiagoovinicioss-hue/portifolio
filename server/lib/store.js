@@ -23,6 +23,7 @@ function createSupabaseStore(cfg) {
     return {
       error: 'supabase not configured',
       list: async () => { throw new Error('store_unconfigured'); },
+      create: async () => { throw new Error('store_unconfigured'); },
       update: async () => { throw new Error('store_unconfigured'); },
       remove: async () => { throw new Error('store_unconfigured'); },
       ready: false,
@@ -44,6 +45,11 @@ function createSupabaseStore(cfg) {
       if (error) throw error;
       return data || [];
     },
+    async create(row) {
+      const { data, error } = await db.from(table).insert(row).select('id').single();
+      if (error) throw error;
+      return data;
+    },
     async update(id, patch) {
       const { error } = await db.from(table).update(patch).eq('id', id);
       if (error) throw error;
@@ -63,6 +69,16 @@ function createMockStore() {
     async list() {
       return [...rows.values()]
         .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+    },
+    async create(row) {
+      const record = {
+        ...row,
+        id: crypto.randomUUID(),
+        status: row.status ?? 'new',
+        created_at: new Date().toISOString(),
+      };
+      rows.set(record.id, record);
+      return { id: record.id };
     },
     async update(id, patch) {
       const row = rows.get(id);

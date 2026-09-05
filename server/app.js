@@ -19,6 +19,45 @@ import { loadConfig } from './lib/config.js';
 import { createAuthValidator } from './lib/supauth.js';
 import { createLeadsStore, VALID_STATUSES } from './lib/store.js';
 
+// Whitelist of columns the public quote form may write. Anything else in the
+// request body is dropped — clients can never set id, status, timestamps, etc.
+const PUBLIC_LEAD_FIELDS = {
+  name: { max: 120 },
+  company_name: { max: 160 },
+  company_type: { max: 100 },
+  contact: { max: 160 },
+  goals: { max: 100 },
+  objective: { max: 100 },
+  how_it_works_today: { max: 2000 },
+  biggest_pain: { max: 2000 },
+  weekly_time_spent: { max: 500 },
+  previous_attempts: { max: 2000 },
+  budget: { max: 80 },
+  additional_info: { max: 2000 },
+  selected_addons: { max: 8, array: true, itemMax: 80 },
+};
+
+function sanitizeLead(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return null;
+  const row = {};
+  for (const [field, spec] of Object.entries(PUBLIC_LEAD_FIELDS)) {
+    const value = body[field];
+    if (value === undefined || value === null) continue;
+    if (spec.array) {
+      if (!Array.isArray(value)) continue;
+      row[field] = value
+        .map((item) => String(item).slice(0, spec.itemMax))
+        .filter((item) => item.length > 0)
+        .slice(0, spec.max);
+    } else {
+      const text = String(value).slice(0, spec.max);
+      if (text.length > 0) row[field] = text;
+    }
+  }
+  if (!row.name) return null;
+  return row;
+}
+
 export function createApp(overrides = {}) {
   const cfg = loadConfig(overrides);
   const auth = createAuthValidator(cfg);
@@ -38,6 +77,23 @@ export function createApp(overrides = {}) {
   // --- Public ---
   app.get('/api/health', (_req, res) => {
     res.json({ ok: true });
+  });
+
+  // Public lead submission from the quote form. Intentionally anonymous: this is
+  // the equivalent of a contact form. Fields are whitelisted and truncated
+  // server-side; the insert runs with the SERVICE role key, so it never depends
+  // on (possibly missing) RLS insert policies in the Supabase dashboard.
+  app.post('/api/leads', async (req, res) => {
+    const row = sanitizeLead(req.body);
+    if (!row) return res.status(400).json({ error: 'bad_request' });
+    try {
+      await store.create(row);
+      res.set('Cache-Control', 'no-store');
+      res.status(201).json({ ok: true });
+    } catch (err) {
+      console.error('leads.create failed', err);
+      res.status(500).json({ error: 'internal' });
+    }
   });
 
   // --- MFA status (uses lighter auth — no AAL enforcement) ---

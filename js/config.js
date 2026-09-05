@@ -29,10 +29,13 @@ export const CONFIG = {
 
   // Lead storage + authentication backend (Supabase).
   // The publishable/anon key below is PUBLIC by design (safe to ship to the
-  // browser). It lets the quote form insert leads under Row Level Security and
-  // lets supabase-js sign in with email/password for the private area. The
-  // SERVICE ROLE key (sb_secret_*) is NEVER placed here or anywhere in this
-  // repository: it lives only in the backend's environment.
+  // browser). It lets supabase-js sign in with email/password for the private
+  // area. The SERVICE ROLE key (sb_secret_*) is NEVER placed here or anywhere
+  // in this repository: it lives only in the backend's environment.
+  //
+  // Quote submissions are saved through the backend (POST /api/leads, service
+  // role server-side). The anon key is only used for the direct-insert
+  // fallback when apiBaseUrl is empty and for the admin's Supabase Auth login.
   supabase: {
     url: 'https://eimtmksxkojpqjsdiwmn.supabase.co',
     anonKey: 'sb_publishable_CQjrAVAReTakJU4jMiuR5A_AWmJTqyn',

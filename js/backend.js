@@ -19,27 +19,55 @@ async function ensureClient() {
   return loadPromise;
 }
 
-// ---- Quote form (public insert, direct to Supabase with anon key + RLS) ----
+// ---- Quote form (public insert) ----
+//
+// Preferred path: POST through the authorized backend, which stores the lead
+// with the service-role key server-side. That insert never depends on RLS
+// policies in the Supabase dashboard, so a misconfigured DB can't silently
+// swallow leads. Falls back to a direct anon-key insert only when no backend
+// is configured (standalone mode).
 export async function saveLead(payload) {
+  const clean = {
+    name: String(payload.name || '').slice(0, 120),
+    company_name: String(payload.company_name || '').slice(0, 160),
+    company_type: String(payload.company_type || '').slice(0, 100),
+    contact: String(payload.contact || '').slice(0, 160),
+    goals: String(payload.goals || '').slice(0, 100),
+    objective: String(payload.objective || '').slice(0, 100),
+    how_it_works_today: String(payload.how_it_works_today || '').slice(0, 2000),
+    biggest_pain: String(payload.biggest_pain || '').slice(0, 2000),
+    weekly_time_spent: String(payload.weekly_time_spent || '').slice(0, 500),
+    previous_attempts: String(payload.previous_attempts || '').slice(0, 2000),
+    budget: String(payload.budget || '').slice(0, 80),
+    additional_info: String(payload.additional_info || '').slice(0, 2000),
+    selected_addons: Array.isArray(payload.selected_addons)
+      ? payload.selected_addons.slice(0, 8).map((x) => String(x).slice(0, 80))
+      : [],
+  };
+
+  const { apiBaseUrl } = CONFIG.auth;
+  if (apiBaseUrl) {
+    let res;
+    try {
+      res = await fetch(`${apiBaseUrl}/api/leads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(clean),
+      });
+    } catch (_) {
+      throw new Error('unavailable');
+    }
+    if (res.status === 429) throw new Error('rate_limited');
+    if (!res.ok) throw new Error(res.status >= 500 ? 'unavailable' : 'request_failed');
+    const data = await res.json().catch(() => null);
+    return data;
+  }
+
   const supabase = await ensureClient();
   if (!supabase) throw new Error('backend not configured');
   const { data, error } = await supabase
     .from(CONFIG.supabase.leadsTable)
-    .insert({
-      name: String(payload.name || '').slice(0, 120),
-      company_name: String(payload.company_name || '').slice(0, 160),
-      company_type: String(payload.company_type || '').slice(0, 100),
-      contact: String(payload.contact || '').slice(0, 160),
-      goals: String(payload.goals || '').slice(0, 100),
-      objective: String(payload.objective || '').slice(0, 100),
-      how_it_works_today: String(payload.how_it_works_today || '').slice(0, 2000),
-      biggest_pain: String(payload.biggest_pain || '').slice(0, 2000),
-      weekly_time_spent: String(payload.weekly_time_spent || '').slice(0, 500),
-      previous_attempts: String(payload.previous_attempts || '').slice(0, 2000),
-      budget: String(payload.budget || '').slice(0, 80),
-      additional_info: String(payload.additional_info || '').slice(0, 2000),
-      selected_addons: Array.isArray(payload.selected_addons) ? payload.selected_addons.slice(0, 8) : [],
-    })
+    .insert(clean)
     .select('id')
     .single();
   if (error) throw new Error(error.message);

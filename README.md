@@ -195,3 +195,27 @@ Push to `main` with Pages enabled (Settings → Pages → source `main`, root).
 
 Set `CONFIG.auth.apiBaseUrl` to the deployed backend URL and use the GitHub Pages
 origin in `FRONTEND_ORIGINS`.
+
+## Troubleshooting — "área restrita não mostra os leads"
+
+If a client's quote **opens WhatsApp but the lead never appears** in the admin
+dashboard, the cause is usually that the **public insert policy is missing** on
+the live Supabase database (Supabase rejects the insert with
+`42501 ... violates row-level security`), and the client is silently redirected
+to WhatsApp without anything being stored.
+
+Most of this is now handled automatically:
+
+- Since the backend-first change, the quote form saves leads via
+  `POST /api/leads` → the backend inserts them with the **service role key**
+  server-side, which bypasses RLS entirely. No dashboard action is required.
+- If a save still fails, the site now shows a visible warning on the success
+  screen instead of silently dropping the lead.
+
+Still useful to apply once (dashboard → **SQL Editor** → run `supabase/policies.sql`,
+idempotent, never touches existing data): it is required only for the *direct
+anon-insert* fallback used when `apiBaseUrl` is empty.
+
+If the admin itself shows "Não foi possível carregar os leads", check the
+backend env instead: `SUPABASE_SERVICE_ROLE_KEY` must be set on the deployed
+service (Render → your service → Environment).

@@ -35,6 +35,7 @@ class QuoteFlow {
     this.doneBtn = shell.querySelector('#quoteDone');
     this.waLink = shell.querySelector('#quoteWaLink');
     this.savedNote = shell.querySelector('#quoteSavedNote');
+    this.errorNote = shell.querySelector('#quoteErrorNote');
     this.budgetOptions = [...shell.querySelectorAll('.budget-option')];
     this.hpInput = shell.querySelector('[name="hp"]');
     this.addonGrid = shell.querySelector('#quoteAddonGrid');
@@ -341,6 +342,7 @@ class QuoteFlow {
     };
 
     let saved = false;
+    let saveFailed = false;
     if (isBackendConfigured()) {
       this.submitting = true;
       this.showLoading(true);
@@ -350,7 +352,7 @@ class QuoteFlow {
         saved = true;
       } catch (err) {
         console.error('lead save failed', err);
-        saved = false;
+        saveFailed = true;
       } finally {
         this.showLoading(false);
         this.submitBtn.classList.remove('is-loading');
@@ -359,7 +361,7 @@ class QuoteFlow {
     }
 
     this.waLink.href = whatsappUrl(message);
-    this.showSuccess(saved);
+    this.showSuccess(saved, { saveFailed });
     window.open(this.waLink.href, '_blank', 'noopener');
   }
 
@@ -385,13 +387,15 @@ class QuoteFlow {
     return lines.join('\n');
   }
 
-  showSuccess(saved) {
+  showSuccess(saved, opts) {
+    const { saveFailed = false } = opts || {};
     this.form.hidden = true;
     this.prevBtn.hidden = true;
     this.nextBtn.hidden = true;
     this.submitBtn.hidden = true;
     this.successEl.hidden = false;
     this.savedNote.hidden = !saved;
+    if (this.errorNote) this.errorNote.hidden = !saveFailed;
     this.progressBar.hidden = true;
 
     window.requestAnimationFrame(() => {
