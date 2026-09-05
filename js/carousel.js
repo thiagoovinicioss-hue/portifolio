@@ -145,13 +145,7 @@ export class Carousel {
         </div>
       `;
 
-      // show "ler mais" only when the description is actually clipped
       this.ring.appendChild(card);
-      const descEl = card.querySelector('.card-desc');
-      if (descEl && descEl.scrollHeight <= descEl.clientHeight + 1) {
-        const more = card.querySelector('.card-more');
-        if (more) more.hidden = true;
-      }
       return card;
     });
 
