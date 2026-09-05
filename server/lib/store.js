@@ -45,14 +45,18 @@ function createSupabaseStore(cfg) {
   const table = cfg.supabase.leadsTable;
 
   // Lazy, cached discovery of the columns that actually exist on the live
-  // table. PostgREST reports the first missing column per request, so we drop
-  // it from the probe and retry until only existing columns remain.
-  let knownColumnsPromise = null;
-  function knownColumns() {
-    if (!knownColumnsPromise) {
-      knownColumnsPromise = discoverColumns(db, table);
+  // table (re-probed periodically so newly added columns are picked up
+  // without a redeploy). A stale/missing column must never fail the insert.
+  const COLUMN_TTL_MS = 5 * 60 * 1000;
+  let knownColumnsResult = null;
+  let knownColumnsAt = 0;
+  async function knownColumns() {
+    const now = Date.now();
+    if (!knownColumnsResult || now - knownColumnsAt > COLUMN_TTL_MS) {
+      knownColumnsResult = await discoverColumns(db, table);
+      knownColumnsAt = now;
     }
-    return knownColumnsPromise;
+    return knownColumnsResult;
   }
 
   return {
