@@ -90,16 +90,17 @@ function createSupabaseStore(cfg) {
 
 async function discoverColumns(db, table, candidates = INSERTABLE_COLUMNS) {
   const existing = new Set();
-  let pending = [...candidates];
-  while (pending.length > 0) {
-    const { error } = await db.from(table).select(pending.join(',')).limit(0);
+  for (const column of candidates) {
+    const { error } = await db.from(table).select(column).limit(0);
     if (!error) {
-      for (const column of pending) existing.add(column);
-      return existing;
+      existing.add(column);
+    } else {
+      // Column-not-found surfaces as either a PostgREST PGRST204 error or a raw
+      // Postgres parse error depending on the query shape. Any other error is a
+      // real failure (network/permissions) and must not be swallowed.
+      const message = String(error.message || '');
+      if (!/PGRST204|does not exist|Could not find the column/i.test(message)) throw error;
     }
-    const match = /Could not find the '([^']+)' column/.exec(String(error.message || ''));
-    if (!match) throw error;
-    pending = pending.filter((column) => column !== match[1]);
   }
   return existing;
 }
