@@ -13,6 +13,15 @@ import { createClient } from '@supabase/supabase-js';
 
 export const VALID_STATUSES = ['new', 'contacted', 'negotiation', 'won', 'lost'];
 
+// Columns the quote form is allowed to write (matches supabase/schema.sql).
+// Insertions are filtered against the live table's actual columns (discovered
+// once), so a stale/missing column never fails the whole lead insert.
+const INSERTABLE_COLUMNS = [
+  'name', 'company_name', 'company_type', 'contact', 'goals', 'objective',
+  'how_it_works_today', 'biggest_pain', 'weekly_time_spent', 'previous_attempts',
+  'budget', 'additional_info', 'selected_addons',
+];
+
 export function createLeadsStore(cfg) {
   if (cfg.supabase.mock) return createMockStore();
   return createSupabaseStore(cfg);
@@ -35,6 +44,17 @@ function createSupabaseStore(cfg) {
   });
   const table = cfg.supabase.leadsTable;
 
+  // Lazy, cached discovery of the columns that actually exist on the live
+  // table. PostgREST reports the first missing column per request, so we drop
+  // it from the probe and retry until only existing columns remain.
+  let knownColumnsPromise = null;
+  function knownColumns() {
+    if (!knownColumnsPromise) {
+      knownColumnsPromise = discoverColumns(db, table);
+    }
+    return knownColumnsPromise;
+  }
+
   return {
     ready: true,
     async list() {
@@ -46,7 +66,14 @@ function createSupabaseStore(cfg) {
       return data || [];
     },
     async create(row) {
-      const { data, error } = await db.from(table).insert(row).select('id').single();
+      const existing = await knownColumns();
+      const insertable = {};
+      for (const field of INSERTABLE_COLUMNS) {
+        if (existing.has(field) && Object.prototype.hasOwnProperty.call(row, field)) {
+          insertable[field] = row[field];
+        }
+      }
+      const { data, error } = await db.from(table).insert(insertable).select('id').single();
       if (error) throw error;
       return data;
     },
@@ -59,6 +86,22 @@ function createSupabaseStore(cfg) {
       if (error) throw error;
     },
   };
+}
+
+async function discoverColumns(db, table, candidates = INSERTABLE_COLUMNS) {
+  const existing = new Set();
+  let pending = [...candidates];
+  while (pending.length > 0) {
+    const { error } = await db.from(table).select(pending.join(',')).limit(0);
+    if (!error) {
+      for (const column of pending) existing.add(column);
+      return existing;
+    }
+    const match = /Could not find the '([^']+)' column/.exec(String(error.message || ''));
+    if (!match) throw error;
+    pending = pending.filter((column) => column !== match[1]);
+  }
+  return existing;
 }
 
 function createMockStore() {
