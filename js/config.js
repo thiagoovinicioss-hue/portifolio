@@ -15,7 +15,7 @@ export const CONFIG = {
 
   // Social & contact links.
   social: {
-    linkedin: 'https://www.linkedin.com/in/thiago-vinicius-b-araujo-vinicius-81108b341',
+    linkedin: 'https://www.linkedin.com/in/thiagovin%C3%ADciusbara%C3%BAjo/',
     instagram: 'https://www.instagram.com/thiagovinnicius14/',
     whatsapp: '#', // filled below from whatsapp.number
     github: 'https://github.com/thiagoovinicioss-hue',
