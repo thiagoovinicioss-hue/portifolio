@@ -1028,6 +1028,7 @@
 /* ---------- Leads panel ---------- */
 .leads-panel {
   width: 100%;
+  height: 460px;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -1044,7 +1045,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   background: var(--surface-2);
   border-bottom: 1px solid var(--line);
 }
@@ -1144,11 +1145,11 @@
   display: flex;
   align-items: center;
   gap: 24px;
-  padding: 12px 16px 2px;
+  padding: 10px 14px 0;
 }
 .leads-stat { display: flex; align-items: baseline; gap: 7px; }
-.leads-stat-num { font-family: var(--serif); font-weight: 600; font-size: 20px; color: var(--ink); line-height: 1; }
-.leads-stat-label { font-size: 12px; color: var(--ink-soft); }
+.leads-stat-num { font-family: var(--serif); font-weight: 600; font-size: 18px; color: var(--ink); line-height: 1; }
+.leads-stat-label { font-size: 11.5px; color: var(--ink-soft); }
 .leads-stat-num.is-pop { animation: countPop 0.45s var(--ease); }
 @keyframes countPop {
   0% { transform: scale(1); }
@@ -1174,7 +1175,7 @@
 .leads-body {
   flex: 1;
   min-height: 0;
-  padding: 8px 16px 16px;
+  padding: 6px 14px 12px;
   opacity: 1;
   transition: opacity 0.5s ease;
 }
@@ -1393,7 +1394,7 @@
   .practice-chip { transform: translateY(-6px); }
   .practice-chip.is-done, .practice-chip.is-active { transform: translateY(0); }
   .wa-body { height: 330px; }
-  .leads-panel { height: auto; }
+  .leads-panel { height: 460px; }
   .journey-track { grid-template-columns: 1fr; gap: 26px; }
   .journey-line { display: none; }
   .journey-step { gap: 4px; }
@@ -1401,7 +1402,7 @@
 
 @media (max-width: 520px) {
   .wa-body { height: 320px; }
-  .leads-panel { height: auto; }
+  .leads-panel { height: 460px; }
   .leads-search { display: none; }
   .leads-cols { grid-template-columns: minmax(0, 1fr) auto; }
   .leads-cols > span:first-child { grid-column: 1 / 2; }
